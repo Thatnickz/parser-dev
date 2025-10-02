@@ -16,6 +16,8 @@ body {
   background-color: var(--light-gray);
   margin: 0;
   padding: 20px;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
 }
 
 h1,
@@ -40,6 +42,8 @@ header {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .file-upload-button {
@@ -53,6 +57,27 @@ header {
 
 .file-upload-button:hover {
   background-color: #0056b3;
+}
+
+.pdf-button {
+  background-color: #28a745;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  font-family: "Lato", sans-serif;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.pdf-button:hover {
+  background-color: #218838;
+}
+
+.pdf-button:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
 }
 
 input[type="file"] {
@@ -85,6 +110,8 @@ input[type="file"] {
   padding: 20px 30px;
   margin-bottom: 40px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
 }
 
 .module-title {
@@ -100,6 +127,8 @@ input[type="file"] {
   padding: 10px 20px;
   margin: 20px 0;
   border-radius: 0 5px 5px 0;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
 }
 
 .question {
@@ -172,6 +201,8 @@ input[type="file"] {
   border-color: var(--correct-border);
   color: var(--correct-text);
   font-weight: bold;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
 }
 
 .spr-answer {
@@ -189,6 +220,8 @@ input[type="file"] {
   border-radius: 4px;
   font-weight: bold;
   font-family: monospace;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
 }
 
 math {
@@ -197,4 +230,31 @@ math {
 
 .sr-only {
   display: none;
+}
+
+@media print {
+  header {
+    display: none;
+  }
+  
+  body {
+    background-color: white;
+    padding: 0;
+    margin: 0;
+  }
+  
+  #testContainer {
+    max-width: 100%;
+  }
+  
+  .module {
+    page-break-inside: avoid;
+    break-inside: avoid;
+    box-shadow: none;
+  }
+  
+  .question {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
 }
