@@ -2,13 +2,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const fileInput = document.getElementById("jsonFileInput");
   const testContainer = document.getElementById("testContainer");
   const fileNameSpan = document.getElementById("fileName");
+  const downloadPdfButton = document.getElementById("downloadPdfButton");
 
   fileInput.addEventListener("change", handleFileSelect);
+  downloadPdfButton.addEventListener("click", downloadPdf);
 
   function handleFileSelect(event) {
     const file = event.target.files[0];
     if (!file) {
       fileNameSpan.textContent = "No file chosen";
+      downloadPdfButton.style.display = "none";
       return;
     }
 
@@ -18,14 +21,26 @@ document.addEventListener("DOMContentLoaded", () => {
     reader.onload = function (e) {
       try {
         const jsonContent = JSON.parse(e.target.result);
-        renderTest(jsonContent);
+        try {
+          renderTest(jsonContent);
+          downloadPdfButton.style.display = "inline-block";
+        } catch (renderError) {
+          testContainer.innerHTML = `<div class="placeholder"><p style="color: red;">Error rendering test content. Please check the console for details.</p></div>`;
+          console.error("Rendering Error:", renderError);
+          downloadPdfButton.style.display = "none";
+        }
       } catch (error) {
         testContainer.innerHTML = `<div class="placeholder"><p style="color: red;">Error: Could not parse JSON file. Please ensure it's a valid test file.</p></div>`;
         console.error("JSON Parsing Error:", error);
+        downloadPdfButton.style.display = "none";
       }
     };
 
     reader.readAsText(file);
+  }
+
+  function downloadPdf() {
+    window.print();
   }
 
   function renderTest(data) {
@@ -59,7 +74,9 @@ document.addEventListener("DOMContentLoaded", () => {
     Object.values(scoringData.sections).forEach((section) => {
       if (section.questions) {
         Object.entries(section.questions).forEach(([itemId, questionData]) => {
-          map.set(itemId, questionData.keys[0]);
+          if (questionData.keys && questionData.keys.length > 0) {
+            map.set(itemId, questionData.keys[0]);
+          }
         });
       }
     });
@@ -88,10 +105,16 @@ document.addEventListener("DOMContentLoaded", () => {
       });
       questionHtml += `</ul></div>`;
     } else if (item.type === "spr") {
-      const answers = correctAnswerKey.split("||").join(" or ");
-      questionHtml += `<div class="spr-answer">`;
-      questionHtml += `<strong>Correct Answer:</strong> <span class="correct-text">${answers}</span>`;
-      questionHtml += `</div>`;
+      if (correctAnswerKey) {
+        const answers = correctAnswerKey.split("||").join(" or ");
+        questionHtml += `<div class="spr-answer">`;
+        questionHtml += `<strong>Correct Answer:</strong> <span class="correct-text">${answers}</span>`;
+        questionHtml += `</div>`;
+      } else {
+        questionHtml += `<div class="spr-answer">`;
+        questionHtml += `<em>Answer key not available</em>`;
+        questionHtml += `</div>`;
+      }
     }
 
     questionHtml += `</div>`;
